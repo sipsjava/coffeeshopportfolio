@@ -11,6 +11,44 @@ const sizes = {
     width: window.innerWidth
 };
 
+const sinkFans = [];
+const acFan = [];
+
+
+let currentIntersects = [];
+const intersects = [];
+const raycasterObjects = [];
+const socalLinks = {
+    "Github": "https://github.com/sipsjava/",
+    "LinkedIn": "https://www.linkedin.com/in/britneyannbeall/",
+
+}
+
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
+window.addEventListener("mousemove", (e) =>{
+    pointer.x = (e.clientx / sizes.width) * 2 - 1;
+    pointer.y = -(e.clientY / sizes.height) * 2 + 1;
+});
+
+window.addEventListener("click", (e) =>{
+    if(currentIntersects.length > 0){
+        const object = currentIntersects[0].object;
+        Object.entries(socialLinks).forEach(([key, url]) => {
+            if(object.name.includes(key)){
+                const newWindow = window.open();
+                newWindow.opener = null;
+                newWindow.locaiton =url; 
+                newWindow.target = "_blank";
+                newWindow.rel = "noopener noreferrer";
+            }
+        })
+    }
+    pointer.x = (e.clientx / sizes.width) * 2 - 1;
+    pointer.y = -(e.clientY / sizes.height) * 2 + 1;
+});
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, .1, 1000);
 camera.position.set(-29.81365715721389, 7.860900199165037, -9.422209800727748);
@@ -113,6 +151,16 @@ loader.load("/models/coffee_shop_devfolio.glb", (glb) => {
                     child.material = material;
                 }
             });
+            if(child.name.includes("target")){
+                raycasterObjects.push(child);
+                console.log(child.name);
+            }
+            if(child.name.includes("fan")){
+                if(child.name.includes("ac")){
+                    acFan.push(child);
+                }
+                else {sinkFans.push(child);}
+            }            
 
             if(child.name.includes("glass")){
                 child.material = glassMaterial;
@@ -147,6 +195,28 @@ const render = () => {
 
     renderer.render(scene, camera);
     window.requestAnimationFrame(render);
+
+    //Animate Fans
+    acFan.forEach( acfan => {
+        acFan.flipY = false;
+        acfan.rotation.y += .15;
+
+    });
+        sinkFans.forEach(sinkfan => {
+        sinkfan.rotation.x += .1;
+    });
+
+    raycaster.setFromCamera(pointer, camera);
+	const intersects = raycaster.intersectObjects(raycasterObjects);
+	for ( let i = 0; i < intersects.length; i ++ ) {intersects[ i ].object.material.color.set( 0xff0000 );}
+
+    if(intersects.length > 0){
+        document.body.style.cursor = "pointer";
+        } else {
+        document.body.style.cursor = "default";
+    }
+        renderer.render(scene, camera);
+
 };
 
 render();
