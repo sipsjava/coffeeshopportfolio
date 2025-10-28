@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import gsap from "gsap";
 
 // Scene
 const canvas = document.querySelector("#experience-canvas");
@@ -11,41 +12,65 @@ const sizes = {
     width: window.innerWidth
 };
 
+const modals = {
+    about: document.querySelector(".modal.about"), 
+    email: document.querySelector(".modal.email"), 
+};
+
+document.querySelectorAll(".modal-exit-button").forEach((button) => {
+    button.addEventListener("click", (e) => {
+        const modal = e.target.closest(".modal");
+        hideModal(modal);
+    });
+});
+const showModal = (modal) => {
+    modal.style.display = "block";
+
+    gsap.set(modal, {opacity: 0});
+    gsap.to(modal, {opacity: 1, duration: .5});
+}
+
+const hideModal = (modal) => {
+    gsap.to(modal, {opacity: 0, duration: .5, onComplete: () => {
+        modal.style.display = "none";
+    }});
+}
 const sinkFans = [];
 const acFan = [];
 
-
 let currentIntersects = [];
-const intersects = [];
 const raycasterObjects = [];
-const socalLinks = {
-    "Github": "https://github.com/sipsjava/",
-    "LinkedIn": "https://www.linkedin.com/in/britneyannbeall/",
-
+const socialLinks = {
+    "github": "https://github.com/sipsjava/",
+    "linkedin": "https://www.linkedin.com/in/britneyannbeall/",
 }
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 
-window.addEventListener("mousemove", (e) =>{
-    pointer.x = (e.clientx / sizes.width) * 2 - 1;
+window.addEventListener("mousemove", (e) => {
+    pointer.x = (e.clientX / sizes.width) * 2 - 1;
     pointer.y = -(e.clientY / sizes.height) * 2 + 1;
 });
 
-window.addEventListener("click", (e) =>{
+window.addEventListener("click", (e) => {
     if(currentIntersects.length > 0){
         const object = currentIntersects[0].object;
         Object.entries(socialLinks).forEach(([key, url]) => {
             if(object.name.includes(key)){
                 const newWindow = window.open();
                 newWindow.opener = null;
-                newWindow.locaiton =url; 
+                newWindow.location = url;
                 newWindow.target = "_blank";
                 newWindow.rel = "noopener noreferrer";
             }
-        })
+        });
+
+        if(object.name.includes("email")){
+            showModal(modals.email);
+        }
     }
-    pointer.x = (e.clientx / sizes.width) * 2 - 1;
+    pointer.x = (e.clientX / sizes.width) * 2 - 1;
     pointer.y = -(e.clientY / sizes.height) * 2 + 1;
 });
 
@@ -168,11 +193,6 @@ loader.load("/models/coffee_shop_devfolio.glb", (glb) => {
             if(child.name.includes("screen")){
                 child.material = new THREE.MeshBasicMaterial({map: screen});
             }
-            if(child.name.includes("hitbox")){
-                child.material = new THREE.MeshBasicMaterial({
-                    visible: false                
-                });            
-            }
         }
     });
     scene.add(glb.scene);
@@ -191,32 +211,44 @@ window.addEventListener("resize", () => {
 });
 
 const render = () => {
-    controls.update();
-
-    renderer.render(scene, camera);
-    window.requestAnimationFrame(render);
-
-    //Animate Fans
-    acFan.forEach( acfan => {
-        acFan.flipY = false;
+    // Animate Fans
+    acFan.forEach(acfan => {
         acfan.rotation.y += .15;
-
     });
-        sinkFans.forEach(sinkfan => {
+    
+    sinkFans.forEach(sinkfan => {
         sinkfan.rotation.x += .1;
     });
 
     raycaster.setFromCamera(pointer, camera);
-	const intersects = raycaster.intersectObjects(raycasterObjects);
-	for ( let i = 0; i < intersects.length; i ++ ) {intersects[ i ].object.material.color.set( 0xff0000 );}
+    currentIntersects = raycaster.intersectObjects(raycasterObjects);
+    
 
-    if(intersects.length > 0){
-        document.body.style.cursor = "pointer";
-        } else {
+    // Reset all objects to original color first
+    raycasterObjects.forEach(obj => {
+        if (obj.material) {
+            obj.material.color.set(0xffffff);
+        }
+    });
+
+    // Highlight intersected objects
+    for (let i = 0; i < currentIntersects.length; i++) {
+        currentIntersects[i].object.material.color.set(0xff0000);
+    }
+
+    if(currentIntersects.length > 0) {
+        const currentIntersectsObject = currentIntersects[0].object;
+        if(currentIntersectsObject.name.includes("target")){
+        document.body.style.cursor = "pointer"; } 
+    }
+
+    else {
         document.body.style.cursor = "default";
     }
-        renderer.render(scene, camera);
 
+    controls.update();
+    window.requestAnimationFrame(render);
+    renderer.render(scene, camera);
 };
 
 render();
