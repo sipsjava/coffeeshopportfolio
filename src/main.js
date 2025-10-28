@@ -5,6 +5,21 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import gsap from "gsap";
 
+
+const sinkFans = [];
+const acFan = [];
+let currentHovered = null;
+const giantBean = [];
+let currentIntersects = [];
+const raycasterObjects = [];
+const hoverObjects = [];
+const socialLinks = {
+    "github": "https://github.com/sipsjava/",
+    "linkedin": "https://www.linkedin.com/in/britneyannbeall/",
+}
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
 // Scene
 const canvas = document.querySelector("#experience-canvas");
 const sizes = {
@@ -17,15 +32,24 @@ const modals = {
     email: document.querySelector(".modal.email"), 
 };
 
+let touchHappened = false;
 document.querySelectorAll(".modal-exit-button").forEach((button) => {
-    button.addEventListener("click", (e) => {
+    button.addEventListener("touchend", 
+        (e) => {
+        touchHappened = true;
         const modal = e.target.closest(".modal");
         hideModal(modal);
-    });
+    }, {passive: false});
+
+    button.addEventListener("click", (e) => {
+        if (touchHappened) return;
+        const modal = e.target.closest(".modal");
+        hideModal(modal);
+    }, {passive: false});
 });
+
 const showModal = (modal) => {
     modal.style.display = "block";
-
     gsap.set(modal, {opacity: 0});
     gsap.to(modal, {opacity: 1, duration: .5});
 }
@@ -35,25 +59,26 @@ const hideModal = (modal) => {
         modal.style.display = "none";
     }});
 }
-const sinkFans = [];
-const acFan = [];
 
-let currentIntersects = [];
-const raycasterObjects = [];
-const socialLinks = {
-    "github": "https://github.com/sipsjava/",
-    "linkedin": "https://www.linkedin.com/in/britneyannbeall/",
-}
-
-const raycaster = new THREE.Raycaster();
-const pointer = new THREE.Vector2();
 
 window.addEventListener("mousemove", (e) => {
+    touchHappened = false;
     pointer.x = (e.clientX / sizes.width) * 2 - 1;
     pointer.y = -(e.clientY / sizes.height) * 2 + 1;
 });
 
-window.addEventListener("click", (e) => {
+window.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    pointer.x = (e.touches[0].clientX / sizes.width) * 2 - 1;
+    pointer.y = -(e.touches[0].clientY / sizes.height) * 2 + 1;
+}, {passive: false});
+
+window.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    handleRaycasterInteraction();
+}, {passive: false});
+
+function handleRaycasterInteraction(){
     if(currentIntersects.length > 0){
         const object = currentIntersects[0].object;
         Object.entries(socialLinks).forEach(([key, url]) => {
@@ -70,9 +95,9 @@ window.addEventListener("click", (e) => {
             showModal(modals.email);
         }
     }
-    pointer.x = (e.clientX / sizes.width) * 2 - 1;
-    pointer.y = -(e.clientY / sizes.height) * 2 + 1;
-});
+}
+
+window.addEventListener("click", handleRaycasterInteraction);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, .1, 1000);
@@ -178,14 +203,24 @@ loader.load("/models/coffee_shop_devfolio.glb", (glb) => {
             });
             if(child.name.includes("target")){
                 raycasterObjects.push(child);
-                console.log(child.name);
+            }
+            if(child.name.includes("hover")){
+                child.userData.initialScale = new THREE.Vector3().copy(child.scale);
+                child.userData.initialPosition = new THREE.Vector3().copy(child.position);
+                child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+                child.userData.isAnimating = false;
+                hoverObjects.push(child);
+                hoverObjects.forEach((obj) => {console.log(obj.name)});
             }
             if(child.name.includes("fan")){
                 if(child.name.includes("ac")){
                     acFan.push(child);
                 }
                 else {sinkFans.push(child);}
-            }            
+            }      
+            if(child.name.includes("bean")){
+                giantBean.push(child);
+            }      
 
             if(child.name.includes("glass")){
                 child.material = glassMaterial;
@@ -210,6 +245,193 @@ window.addEventListener("resize", () => {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
+function playHoverAnimation(object, isHovering){
+    if(object.userData.isAnimating) return;
+    
+    object.userData.isAnimating = true;
+    
+    gsap.killTweensOf(object.scale);
+    gsap.killTweensOf(object.rotation);
+    gsap.killTweensOf(object.position);
+    
+    if(object.name.includes("umb")) {
+        if(isHovering) {
+            gsap.to(object.rotation, {
+                y: 1.5,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+        } else {
+            gsap.to(object.rotation, {
+                y: object.userData.initialRotation.y,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+        }
+    }
+
+        if(object.name.includes("front")) {
+            let glass = null;
+            hoverObjects.forEach((obj) => {if(obj.name.includes("front_door_window")) {glass = obj;}})
+        if(isHovering) {
+            gsap.to(object.rotation, {
+                y: -1.5,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+            gsap.to(glass.rotation, {
+                y: 1.5,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {glass.userData.isAnimating = false; }
+            });
+        } else {
+            gsap.to(object.rotation, {
+                y: glass.userData.initialRotation.y,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+            gsap.to(glass.rotation, {
+                y: glass.userData.initialRotation.y,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {glass.userData.isAnimating = false; }
+            });
+        }
+    }
+
+            if(object.name.includes("patio_door_glass")) 
+                {
+            let knob = null;
+            hoverObjects.forEach((obj) => {if(obj.name.includes("knob")) {knob = obj;}})
+                if(isHovering) {
+            gsap.to(object.rotation, {
+                y: -.5,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+            gsap.to(knob.rotation, {
+                y: -.5,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {knob.userData.isAnimating = false; }
+            });
+        } else {
+            gsap.to(object.rotation, {
+                y: knob.userData.initialRotation.y,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+            gsap.to(knob.rotation, {
+                y: knob.userData.initialRotation.y,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {knob.userData.isAnimating = false; }
+            });
+        }
+    }
+    if(object.name.includes("back_door_hover")) 
+                {
+            let glass = null;
+            hoverObjects.forEach((obj) => {if(obj.name.includes("back_door_window")) {glass = obj;}})
+                if(isHovering) {
+            gsap.to(object.rotation, {
+                y: 1.5,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+            gsap.to(glass.rotation, {
+                y: 1.5,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {glass.userData.isAnimating = false; }
+            });
+        } else {
+            gsap.to(object.rotation, {
+                y: glass.userData.initialRotation.y,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+            gsap.to(glass.rotation, {
+                y: glass.userData.initialRotation.y,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {glass.userData.isAnimating = false; }
+            });
+        }
+    }
+
+    if(object.name.includes("dumpster")) 
+                {
+                if(isHovering) {
+            gsap.to(object.rotation, {
+                z: 1,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+        } else {
+            gsap.to(object.rotation, {
+                z: object.userData.initialRotation.z,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+        }
+    }
+
+     if(object.name.includes("breaker")) 
+                {
+                if(isHovering) {
+            gsap.to(object.rotation, {
+                y: -2,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+        } else {
+            gsap.to(object.rotation, {
+                y: object.userData.initialRotation.y,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+        }
+    }
+
+    if(object.name.includes("sign")) 
+                {
+                if(isHovering) {
+            gsap.to(object.scale, {
+                x: 1.5,
+                y: 1.5,
+                z: 1.5,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+        } else {
+  gsap.to(object.scale, {
+                x: 1,
+                y: 1,
+                z: 1,
+                duration: .5,
+                ease: "bounce.out(1.8)",
+                onComplete: () => {object.userData.isAnimating = false; }
+            });
+        }
+    }
+}
+
+
 const render = () => {
     // Animate Fans
     acFan.forEach(acfan => {
@@ -220,29 +442,38 @@ const render = () => {
         sinkfan.rotation.x += .1;
     });
 
-    raycaster.setFromCamera(pointer, camera);
-    currentIntersects = raycaster.intersectObjects(raycasterObjects);
-    
-
-    // Reset all objects to original color first
-    raycasterObjects.forEach(obj => {
-        if (obj.material) {
-            obj.material.color.set(0xffffff);
-        }
+    acFan.forEach(acfan => {
+        acfan.rotation.y += .15;
     });
 
-    // Highlight intersected objects
-    for (let i = 0; i < currentIntersects.length; i++) {
-        currentIntersects[i].object.material.color.set(0xff0000);
+    giantBean.forEach(bean => {
+        bean.rotation.z += .007;
+    })
+
+    raycaster.setFromCamera(pointer, camera);
+    currentIntersects = raycaster.intersectObjects(raycasterObjects);
+    const hoverIntersects = raycaster.intersectObjects(hoverObjects);
+
+    // Handle hover animations
+    if(hoverIntersects.length > 0) {
+        const currentIntersectObject = currentIntersects[0].object;
+        if(currentIntersectObject.name.includes("hover")){
+            if(currentIntersectObject !== currentHovered){
+                if(currentHovered){
+                    playHoverAnimation(currentHovered, false);
+                }
+                playHoverAnimation(currentIntersectObject, true);
+                currentHovered = currentIntersectObject;
+            }
+        }
     }
 
     if(currentIntersects.length > 0) {
         const currentIntersectsObject = currentIntersects[0].object;
-        if(currentIntersectsObject.name.includes("target")){
-        document.body.style.cursor = "pointer"; } 
-    }
-
-    else {
+        if(currentIntersectsObject.name.includes("scale")){
+            document.body.style.cursor = "pointer";
+        } 
+    } else {
         document.body.style.cursor = "default";
     }
 
