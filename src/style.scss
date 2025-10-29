@@ -44,15 +44,41 @@
 }
 
 // Modals
+.modal-title {
+  text-align: center;
+  padding-top: 20px;
+}
 .modal {
   position: absolute;
   top: 50%;
   left: 50%;
   max-width: 700px;
   width: 100%;
+  max-height: 500px;
+  height: 100%;
   transform: translate(-50%, -50%);
   font-size: 32px;
   z-index: 999;
+  opacity: 95%;
   background-color: vars.$base-blue;
-  display: none;
+  display: show;
+  border-radius: 30px;
+}
+
+.modal-exit-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-radius: 30px;
+  border-color: vars.$base-brown;
+  border-width: 3px;
+  font-size: 30px;
+  padding: 10px 20px 10px 20px;
+  background-color: vars.$base-blue;  
+}
+
+.github-event-card {
+  color: red;
+  font-size: 15px;
+  text { padding: 20px;}
 }
