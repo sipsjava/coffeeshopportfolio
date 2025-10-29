@@ -1,6 +1,6 @@
 import './style.scss'
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from './utils/OrbitControls.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import gsap from "gsap";
@@ -19,6 +19,7 @@ const socialLinks = {
 }
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
+let isModalOpen = false;
 
 // Scene
 const canvas = document.querySelector("#experience-canvas");
@@ -48,15 +49,22 @@ document.querySelectorAll(".modal-exit-button").forEach((button) => {
     }, {passive: false});
 });
 
+
 const showModal = (modal) => {
     modal.style.display = "block";
     gsap.set(modal, {opacity: 0});
     gsap.to(modal, {opacity: 1, duration: .5});
+    isModalOpen = true;
+    controls.enabled = false;
+    if(currentHovered){ playHoverAnimation(currentHovered, false); currentHovered = null;}
+    document.body.style.cursor = "default";
 }
 
 const hideModal = (modal) => {
     gsap.to(modal, {opacity: 0, duration: .5, onComplete: () => {
         modal.style.display = "none";
+        isModalOpen = false;
+        controls.enabled = true;
     }});
 }
 
@@ -68,13 +76,16 @@ window.addEventListener("mousemove", (e) => {
 });
 
 window.addEventListener("touchstart", (e) => {
+    if(isModalOpen) return;
     e.preventDefault();
     pointer.x = (e.touches[0].clientX / sizes.width) * 2 - 1;
     pointer.y = -(e.touches[0].clientY / sizes.height) * 2 + 1;
 }, {passive: false});
 
+
 window.addEventListener("touchend", (e) => {
     e.preventDefault();
+    if(isModalOpen) return;
     handleRaycasterInteraction();
 }, {passive: false});
 
@@ -115,6 +126,11 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 controls.target.set(-3.552940186065884, 5.370265500250291, 2.413349325517568);
+controls.minPolarAngle = Math.PI/3;
+controls.maxPolarAngle = Math.PI/2;
+controls.minAzimuthAngle = -10;
+controls.minDistance = 30;
+controls.maxDistance = 75;
 controls.update();
 
 // Loaders
@@ -245,11 +261,9 @@ window.addEventListener("resize", () => {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-function playHoverAnimation(object, isHovering){
-    if(object.userData.isAnimating) return;
-    
-    object.userData.isAnimating = true;
-    
+// TODO: refactor play hover animation function
+
+function playHoverAnimation(object, isHovering){ 
     gsap.killTweensOf(object.scale);
     gsap.killTweensOf(object.rotation);
     gsap.killTweensOf(object.position);
@@ -260,14 +274,12 @@ function playHoverAnimation(object, isHovering){
                 y: 1.5,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
         } else {
             gsap.to(object.rotation, {
                 y: object.userData.initialRotation.y,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
         }
     }
@@ -280,26 +292,22 @@ function playHoverAnimation(object, isHovering){
                 y: -1.5,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
             gsap.to(glass.rotation, {
                 y: 1.5,
                 duration: .5,
-                ease: "bounce.out(1.8)",
-                onComplete: () => {glass.userData.isAnimating = false; }
+                ease: "bounce.out(1.8)"
             });
         } else {
             gsap.to(object.rotation, {
                 y: glass.userData.initialRotation.y,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
             gsap.to(glass.rotation, {
                 y: glass.userData.initialRotation.y,
                 duration: .5,
-                ease: "bounce.out(1.8)",
-                onComplete: () => {glass.userData.isAnimating = false; }
+                ease: "bounce.out(1.8)"
             });
         }
     }
@@ -313,26 +321,22 @@ function playHoverAnimation(object, isHovering){
                 y: -.5,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
             gsap.to(knob.rotation, {
                 y: -.5,
                 duration: .5,
-                ease: "bounce.out(1.8)",
-                onComplete: () => {knob.userData.isAnimating = false; }
+                ease: "bounce.out(1.8)"
             });
         } else {
             gsap.to(object.rotation, {
                 y: knob.userData.initialRotation.y,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
             gsap.to(knob.rotation, {
                 y: knob.userData.initialRotation.y,
                 duration: .5,
-                ease: "bounce.out(1.8)",
-                onComplete: () => {knob.userData.isAnimating = false; }
+                ease: "bounce.out(1.8)"
             });
         }
     }
@@ -345,26 +349,22 @@ function playHoverAnimation(object, isHovering){
                 y: 1.5,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
             gsap.to(glass.rotation, {
                 y: 1.5,
                 duration: .5,
-                ease: "bounce.out(1.8)",
-                onComplete: () => {glass.userData.isAnimating = false; }
+                ease: "bounce.out(1.8)"
             });
         } else {
             gsap.to(object.rotation, {
                 y: glass.userData.initialRotation.y,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
             gsap.to(glass.rotation, {
                 y: glass.userData.initialRotation.y,
                 duration: .5,
-                ease: "bounce.out(1.8)",
-                onComplete: () => {glass.userData.isAnimating = false; }
+                ease: "bounce.out(1.8)"
             });
         }
     }
@@ -376,14 +376,12 @@ function playHoverAnimation(object, isHovering){
                 z: 1,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
         } else {
             gsap.to(object.rotation, {
                 z: object.userData.initialRotation.z,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
         }
     }
@@ -395,14 +393,12 @@ function playHoverAnimation(object, isHovering){
                 y: -2,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
         } else {
             gsap.to(object.rotation, {
                 y: object.userData.initialRotation.y,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
         }
     }
@@ -416,7 +412,6 @@ function playHoverAnimation(object, isHovering){
                 z: 1.5,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
         } else {
   gsap.to(object.scale, {
@@ -425,7 +420,6 @@ function playHoverAnimation(object, isHovering){
                 z: 1,
                 duration: .5,
                 ease: "bounce.out(1.8)",
-                onComplete: () => {object.userData.isAnimating = false; }
             });
         }
     }
@@ -450,6 +444,8 @@ const render = () => {
         bean.rotation.z += .007;
     })
 
+    if(!isModalOpen){
+
     raycaster.setFromCamera(pointer, camera);
     currentIntersects = raycaster.intersectObjects(raycasterObjects);
     const hoverIntersects = raycaster.intersectObjects(hoverObjects);
@@ -470,13 +466,17 @@ const render = () => {
 
     if(currentIntersects.length > 0) {
         const currentIntersectsObject = currentIntersects[0].object;
-        if(currentIntersectsObject.name.includes("scale")){
+        if(currentIntersectsObject.name.includes("hover")){
             document.body.style.cursor = "pointer";
         } 
     } else {
+        if(currentHovered) {
+            playHoverAnimation(currentHovered, false);
+            currentHovered = null;
+        }
         document.body.style.cursor = "default";
     }
-
+    }
     controls.update();
     window.requestAnimationFrame(render);
     renderer.render(scene, camera);
