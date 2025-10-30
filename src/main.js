@@ -5,6 +5,7 @@ import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import gsap from "gsap";
 import { Octokit } from "@octokit/rest";
+import { githubIconAry } from "/src/utils/github_events_iconmap.js";
 
 const sinkFans = [];
 const acFan = [];
@@ -14,7 +15,6 @@ let currentIntersects = [];
 const raycasterObjects = [];
 const hoverObjects = [];
 const socialLinks = {
-  github: "https://github.com/sipsjava/",
   linkedin: "https://www.linkedin.com/in/britneyannbeall/",
 };
 const raycaster = new THREE.Raycaster();
@@ -29,6 +29,7 @@ const sizes = {
 };
 
 const modals = {
+  github: document.querySelector(".modal.github"),
   about: document.querySelector(".modal.about"),
   email: document.querySelector(".modal.email"),
 };
@@ -115,6 +116,9 @@ function handleRaycasterInteraction() {
       }
     });
 
+    if (object.name.includes("email")) {
+      showModal(modals.email);
+    }
     if (object.name.includes("email")) {
       showModal(modals.email);
     }
@@ -515,30 +519,39 @@ let response = await octokit.request("GET /users/sipsjava/events/public", {
   },
 });
 
+console.log(response);
+
 let githubEvents = [];
-for (let i = 0; i < 7; i++) {
+
+for (let i = 0; i < response.data.length; i++) {
+  const matchedKey = Object.keys(githubIconAry).find((key) =>
+    response.data[i].type.toLowerCase().includes(key)
+  );
+  const svgPath = matchedKey
+    ? githubIconAry[matchedKey]
+    : githubIconAry["default"];
+
   githubEvents.push({
     date: response.data[i].created_at,
-    repo: response.data[i].repo.name,
+    repo: response.data[i].repo?.name || "N/A",
     type: response.data[i].type,
+    svg: svgPath,
   });
 }
 
 function formatEvents() {
   githubEvents.values().forEach((item) => {
+    //console.log(item);
     // formatting date from ISO to UTC date only (Tue, 28 Oct 2025)
     let date = new Date(item.date);
     date = date.toUTCString();
     let delim = new Date().getFullYear().toString();
     date = date.split(delim)[0] + delim;
-    console.log(date);
+    // console.log(date);
     item.date = date;
 
     // formatting repo name (removing username)
-    let repo = item.repo;
-    delim = "/";
-    repo = repo.split(delim)[1];
-    item.repo = repo;
+    item.repo = item.repo.split("/")[1];
 
     // formatting type by adding spaces between item name (PushEvent to Push Event)
     let type = item.type;
@@ -549,7 +562,7 @@ function formatEvents() {
     //document.getElementById("github-event-card").append(item.date);
     //document.getElementById("github-event-card").append(item.repo);
     //document.getElementById("github-event-card").append(item.type);
-    console.log(item);
+    // console.log(item);
   });
 }
 
@@ -557,16 +570,21 @@ formatEvents();
 
 //const iterator = githubEvents.values();
 githubEvents.values().forEach((item) => {
-  console.log(item);
-  const modal = document.getElementById("github-modal");
+  const modal = document.getElementById("github modal");
   let card = document.createElement("div");
-  card.id = "github-event-card";
-  const text = document.createTextNode(
-    "Date: " + item.date + " Repo: " + item.repo + " Type: " + item.type
-  );
+  card.className = "github-event-card";
+
+  card.innerHTML = `
+    <img src="${item.svg}" class="event-icon">
+    <div class="event-type">${item.type}</div>
+    <div class="event-date">${item.date}</div>
+    <div class="event-repo">${item.repo}</div>
+  `;
+
+  modal.appendChild(card);
 });
 
-console.log(response);
+//console.log(response);
 console.log(githubEvents);
 
 render();
