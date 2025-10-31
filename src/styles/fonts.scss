@@ -1,9 +1,20 @@
 @font-face {
-    font-family: 'Coffee Terrace';
-    src: url('/fonts/CoffeeTerrace.woff2') format('woff2'),
-        url('/fonts/CoffeeTerrace.woff') format('woff');
+    font-family: 'Take Coffee';
+    src: url('/fonts/TakeCoffee.woff2') format('woff2'),
+        url('/fonts/TakeCoffee.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
 }
+
+@font-face {
+    font-family: 'Helwa';
+    src: url('/fonts/Helwa.woff2') format('woff2'),
+        url('/fonts/Helwa.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+
 

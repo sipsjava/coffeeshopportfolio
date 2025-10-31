@@ -119,7 +119,7 @@ function handleRaycasterInteraction() {
     if (object.name.includes("email")) {
       showModal(modals.email);
     }
-    if (object.name.includes("email")) {
+    if (object.name.includes("github")) {
       showModal(modals.email);
     }
   }
@@ -234,7 +234,7 @@ loader.load("/models/coffee_shop_devfolio.glb", (glb) => {
       Object.keys(textureMap).forEach((key) => {
         if (child.name.includes(key)) {
           const material = new THREE.MeshBasicMaterial({
-            map: loadedTextures.day[key],
+            map: loadedTextures.night[key],
           });
           child.material = material;
         }
@@ -548,7 +548,7 @@ function formatEvents() {
     let delim = new Date().getFullYear().toString();
     date = date.split(delim)[0] + delim;
     // console.log(date);
-    item.date = date;
+    item.date = date.toString();
 
     // formatting repo name (removing username)
     item.repo = item.repo.split("/")[1];
@@ -568,9 +568,10 @@ function formatEvents() {
 
 formatEvents();
 
+/*
 //const iterator = githubEvents.values();
 githubEvents.values().forEach((item) => {
-  const modal = document.getElementById("github modal");
+  const modal = document.getElementById("github-modal-overlay");
   let card = document.createElement("div");
   card.className = "github-event-card";
 
@@ -583,8 +584,9 @@ githubEvents.values().forEach((item) => {
 
   modal.appendChild(card);
 });
-
+*/
 //console.log(response);
 console.log(githubEvents);
+showModal(modals.github);
 
 render();

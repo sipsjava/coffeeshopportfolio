@@ -1,9 +1,13 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/public/images/coffee_bean_favicon.svg" />
-     <link rel="stylesheet" href="./src/style.scss" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/public/images/coffee_bean_favicon.svg"
+    />
+    <link rel="stylesheet" href="./src/style.scss" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>coffee_shop_devfolio</title>
   </head>
@@ -13,27 +17,52 @@
       <canvas id="experience-canvas" class="experience-canvas"></canvas>
     </div>
 
-     <div class="github modal" id="github modal">
-        <h1 class="modal-title">github modal</h1>
-        <button class="modal-exit-button"><img src="images/modal-close-icon.svg" id="modal-close-icon"></button>
+    <div class="github modal" id="github modal">
+      <button class="modal-exit-button">
+        <img src="images/modal-close-icon.svg" id="modal-close-icon" />
+      </button>
+      <h1 class="modal-title">Github Activity</h1>
+      <h3 class="modal-subtitle">sipsjava</h3>
+      <div id="github-modal-overlay">
+        <div class="github-summary">
+          <!-- styling https://github.com/vn7n24fzkq/github-profile-summary-cards -->
+            <img
+              src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=sipsjava&theme=vue"
+              alt="Profile Details"
+            />
+          </div>
+              
+          <div class="github-stats">
+            <!--styling https://github.com/anuraghazra/github-readme-stats-->
+            <img
+              id="languages"
+              src="https://github-readme-stats.vercel.app/api/top-langs/?username=sipsjava&layout=compact&theme=vue"
+              alt="Top Languages"
+            />
+            <!--styling https://github.com/DenverCoder1/github-readme-streak-stats-->
+            <img
+              id="streak"
+              src="https://streak-stats.demolab.com/?user=sipsjava&theme=vue"
+              alt="Top Languages"
+            />
+          </div>
+        </div>
       </div>
+    </div>
 
+    <div class="email modal">
+      <h1 class="modal-title">Contact Me!</h1>
+      <form id="email-form">
+        <input type="email" id="form-email" name="form-email" />
+        <input name="form-message" id="form-message" />
+      </form>
+      <button class="modal-exit-button">X</button>
+    </div>
 
-     <div class="email modal"> 
-        <h1 class="modal-title">Contact Me!</h1>
-        <form id="email-form">
-          <input type="email" id="form-email" name="form-email">
-          <input name="form-message" id="form-message">
-        </form>
-        <button class="modal-exit-button">X</button>
-      </div>
-
-
-      <div class="about modal">
-        <h1 class="modal-title">about modal</h1>
-        <button class="modal-exit-button">exit about</button>
-      </div>
-
+    <div class="about modal">
+      <h1 class="modal-title">about modal</h1>
+      <button class="modal-exit-button">exit about</button>
+    </div>
 
     <script type="module" src="/src/main.js"></script>
   </body>
