@@ -59,7 +59,6 @@
   display: none;
   border-radius: 30px;
   justify-content: center;
-  font-family: "GingerInk";
   padding-bottom: 40px;
   border: 5px black solid;
 }
@@ -72,41 +71,7 @@
   justify-self: center;
 }
 
-.github-summary {
-  img {
-    border-radius: 30px;
-    width: 100%;
-  }
-  display: block;
-}
-.github-stats {
-  #languages {
-    background-size: cover;
-    border-radius: 30px;
-    width: 50%;
-    height: 144px;
-    direction: rtl;
-    background-color: white;
-    background: white;
-    object-fit: cover;
-  }
-
-  #streak {
-    border-radius: 30px;
-    background: white;
-    width: 50%;
-    direction: rtl;
-    height: 145px;
-    color: white;
-    object-fit: cover;
-  }
-  justify-content: center;
-  display: flex;
-  width: 100%;
-  gap: 5px;
-}
-
-#github-modal-overlay {
+#email-modal-overlay {
   font-family: "Helwa";
   justify-self: center;
   position: absolute;
@@ -117,13 +82,30 @@
   max-height: 380px;
   height: 100%;
   transform: translate(-50%, -50%);
-  font-size: 32px;
+  font-size: 28px;
   z-index: 99;
   background-color: vars.$base-darkBlue;
   overflow-y: hidden;
   overflow-x: hidden;
   margin-top: 40px;
   padding: 10px;
+}
+
+.email-form {
+  all: unset;
+  display: flex;
+  max-width: 700px;
+  width: 100%;
+  justify-content: center;
+  #name-cont {
+    display: inline-block;
+  }
+  label {
+    display: block;
+  }
+  input {
+    display: block;
+  }
 }
 
 .modal-exit-button {
@@ -148,29 +130,4 @@
   width: 75px;
   height: 75px;
   fill: red;
-}
-
-.github-event-card {
-  justify-self: center;
-  height: 65px;
-  width: 100%;
-  padding: 10px;
-  background-color: vars.$base-githubPurple;
-  border-radius: 20px;
-  position: relative;
-  color: black;
-  font-size: 18px;
-  margin: 10px 15px 10px 15px;
-  img {
-    display: block;
-  }
-
-  .event-icon {
-    width: 40px;
-    height: 40px;
-    float: left;
-  }
-  .event-type {
-    float: right;
-  }
 }
