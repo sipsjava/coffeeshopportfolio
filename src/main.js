@@ -1,4 +1,3 @@
-import "./style.scss";
 import * as THREE from "three";
 import { OrbitControls } from "./utils/OrbitControls.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
@@ -507,5 +506,101 @@ const render = () => {
 };
 
 showModal(modals.email);
+
+document.addEventListener("DOMContentLoaded", function () {
+  const visibleEmail = document.getElementById("email-input");
+  const visibleMsg = document.getElementById("msg-input");
+  const submitBtn = document.getElementById("submit-form-button");
+  const visibleForm = document.getElementById("email-form");
+
+  // Get the hidden form and its fields
+  const hiddenForm = document.getElementById("contact-frm");
+  const hiddenEmail = document.getElementById("frm-email");
+  const hiddenMsg = document.getElementById("frm-msg");
+
+  // Function to check if the form is valid and enable the button
+  function checkForm() {
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+      visibleEmail.value.trim()
+    );
+    const messageValid = visibleMsg.value.trim().length > 0;
+    submitBtn.disabled = !(emailValid && messageValid);
+    if (!submitBtn.disabled) {
+      submitBtn.textContent = "Send";
+    } else {
+      submitBtn.textContent = "Enter email address and message to send";
+    }
+  }
+
+  // Attach input events to the visible fields to check the form
+  visibleEmail.addEventListener("input", checkForm);
+  visibleMsg.addEventListener("input", checkForm);
+
+  // Initial check
+  checkForm();
+
+  // Attach click event to the submit button
+  submitBtn.addEventListener("click", async function (event) {
+    event.preventDefault(); // Prevent any default behavior (though it's a button, not in a form)
+
+    // Update button text and disable it
+    submitBtn.textContent = "Sending...";
+    submitBtn.disabled = true;
+
+    // Set the hidden form fields with the visible values
+    hiddenEmail.value = visibleEmail.value.trim();
+    hiddenMsg.value = visibleMsg.value.trim();
+
+    // Create FormData from the hidden form
+    const formData = new FormData(hiddenForm);
+
+    try {
+      // Submit the form via fetch
+      const response = await fetch(hiddenForm.action, {
+        method: hiddenForm.method,
+        body: formData,
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (response.ok) {
+        // Success
+        replaceWithSuccess();
+
+        // Hide the form elements? Or show a success message?
+        // For now, let's just show an alert and reset the button
+        //alert("Thank you! Your message has been sent.");
+        // You can also hide the form or show a success message in the page
+      } else {
+        // Handle errors
+        const errorData = await response.json();
+        console.error("Formspree error:", errorData);
+        alert(
+          "Sorry, there was a problem sending your message. Please try again."
+        );
+      }
+    } catch (error) {
+      // Network error
+      console.error("Network error:", error);
+      alert(
+        "Sorry, a network error occurred. Please check your connection and try again."
+      );
+    } finally {
+      // Re-enable the button and reset the text, but only if the form is still visible
+      // We are not hiding the form, so we can reset the button state
+      checkForm(); // This will set the button text and disabled state based on the current visible fields
+    }
+
+    function replaceWithSuccess() {
+      document.getElementById("modal-subtitle").hidden = true;
+      visibleForm.textContent = "Email sent successfully ✓";
+      visibleForm.style.textAlign = "center";
+      visibleForm.style.width = "50%"; // Define a width for the element
+      visibleForm.style.marginLeft = "auto";
+      visibleForm.style.marginRight = "auto";
+    }
+  });
+});
 
 render();

@@ -42,7 +42,7 @@
 .modal-title {
   font-family: "Take Coffee";
   text-align: center;
-  padding-top: 20px;
+  padding-top: 30px;
 }
 .modal {
   position: absolute;
@@ -50,7 +50,7 @@
   left: 50%;
   max-width: 800px;
   width: 100%;
-  max-height: 490px;
+  max-height: 530px;
   height: 100%;
   transform: translate(-50%, -50%);
   font-size: 32px;
@@ -64,25 +64,25 @@
 }
 
 .modal-subtitle {
-  font-family: "Helwa";
+  font-family: "Take Coffee";
+  margin: 13px;
   z-index: 1000;
-  font-size: 30px;
-  cursor: pointer;
+  font-size: 15px;
   justify-self: center;
 }
 
 #email-modal-overlay {
-  font-family: "Helwa";
+  font-family: "Take Coffee";
   justify-self: center;
   position: absolute;
   top: 50%;
   left: 50%;
   max-width: 775px;
   width: 100%;
-  max-height: 380px;
+  max-height: 420px;
   height: 100%;
   transform: translate(-50%, -50%);
-  font-size: 28px;
+  font-size: 25px;
   z-index: 99;
   background-color: vars.$base-darkBlue;
   overflow-y: hidden;
@@ -92,19 +92,79 @@
 }
 
 .email-form {
-  all: unset;
-  display: flex;
-  max-width: 700px;
+  font-family: "Take Coffee";
+  display: block;
+  max-width: 800px;
   width: 100%;
   justify-content: center;
-  #name-cont {
-    display: inline-block;
+  #email-cont {
+    padding: 2px;
+    justify-self: center;
+  }
+  #msg-cont {
+    justify-self: center;
   }
   label {
     display: block;
+    justify-self: center;
+    margin: 10px;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    transition: background-color 5000s ease-in-out 0s;
   }
   input {
+    font-family: "Consolas";
+    justify-self: center;
     display: block;
+    margin: 10px;
+    border: solid black 5px;
+    border-radius: 10px;
+    padding: 5px;
+    background-color: black;
+  }
+  textarea {
+    font-family: "Consolas";
+    resize: none;
+    border: solid black 5px;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: black;
+  }
+
+  textarea::-webkit-scrollbar {
+    width: 8px;
+    background-color: black;
+    cursor: pointer;
+  }
+
+  textarea::-webkit-scrollbar-track {
+    background-color: black;
+    cursor: pointer;
+  }
+  textarea::-webkit-scrollbar-thumb {
+    background: grey;
+    border-radius: 5px;
+    color: black;
+    cursor: pointer;
+  }
+  #submit-form-button {
+    justify-self: center;
+    display: block;
+    margin: 10px;
+    font-family: "Take Coffee";
+    padding: 10px;
+    font-size: 15px;
+  }
+
+  button:enabled {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
   }
 }
 
