@@ -500,12 +500,13 @@ const render = () => {
       document.body.style.cursor = "default";
     }
   }
+
   controls.update();
   window.requestAnimationFrame(render);
   renderer.render(scene, camera);
 };
 
-showModal(modals.email);
+//showModal(modals.email);
 
 document.addEventListener("DOMContentLoaded", function () {
   const visibleEmail = document.getElementById("email-input");
