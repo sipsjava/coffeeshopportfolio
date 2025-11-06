@@ -13,7 +13,6 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
   font-synthesis: none;
@@ -55,12 +54,13 @@
   transform: translate(-50%, -50%);
   font-size: 32px;
   z-index: 99;
-  background-color: vars.$base-darkBlue;
+  //background-color: vars.$base-darkBlue;
+  background-color: vars.$base-cream;
   display: none;
   border-radius: 30px;
   justify-content: center;
   padding-bottom: 40px;
-  border: 5px black solid;
+  border: 5px vars.$base-white solid;
 }
 
 .modal-subtitle {
@@ -84,7 +84,8 @@
   transform: translate(-50%, -50%);
   font-size: 25px;
   z-index: 99;
-  background-color: vars.$base-darkBlue;
+  //background-color: vars.$base-darkBlue;
+  background-color: vars.$base-cream;
   overflow-y: hidden;
   overflow-x: hidden;
   margin-top: 40px;
@@ -115,45 +116,50 @@
   input:-webkit-autofill:focus,
   input:-webkit-autofill:active {
     transition: background-color 5000s ease-in-out 0s;
+    -webkit-text-fill-color: vars.$base-brown !important;
   }
   input {
+    color: vars.$base-brown;
     font-family: "Consolas";
     justify-self: center;
     display: block;
     margin: 10px;
-    border: solid black 5px;
+    border: solid white 5px;
     border-radius: 10px;
     padding: 5px;
-    background-color: black;
+    background-color: vars.$base-white;
   }
   textarea {
     font-family: "Consolas";
     resize: none;
-    border: solid black 5px;
+    color: vars.$base-brown;
+    border: solid white 5px;
     border-radius: 10px;
     padding: 10px;
-    background-color: black;
+    background-color: vars.$base-white;
   }
 
   textarea::-webkit-scrollbar {
     width: 8px;
-    background-color: black;
+    background-color: vars.$base-brown;
     cursor: pointer;
   }
 
   textarea::-webkit-scrollbar-track {
-    background-color: black;
+    background-color: vars.$base-white;
     cursor: pointer;
   }
   textarea::-webkit-scrollbar-thumb {
-    background: grey;
+    background: vars.$base-brown;
     border-radius: 5px;
-    color: black;
+    color: vars.$base-white;
     cursor: pointer;
   }
   #submit-form-button {
     justify-self: center;
     display: block;
+    background-color: vars.$base-brown;
+    border: vars.$base-brown;
     margin: 10px;
     font-family: "Take Coffee";
     padding: 10px;
@@ -175,7 +181,9 @@
   top: -1.7rem;
   right: -1.7rem;
   z-index: 100;
-  background: black;
+  //background: black;
+  background: vars.$base-white;
+  //fill: vars.$base-cream;
   border-radius: 50%;
   width: 75px;
   height: 75px;
