@@ -229,7 +229,7 @@ loader.load("/models/coffee_shop_devfolio.glb", (glb) => {
       Object.keys(textureMap).forEach((key) => {
         if (child.name.includes(key)) {
           const material = new THREE.MeshBasicMaterial({
-            map: loadedTextures.night[key],
+            map: loadedTextures.day[key],
           });
           child.material = material;
         }
